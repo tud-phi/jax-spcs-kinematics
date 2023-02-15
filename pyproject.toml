@@ -54,6 +54,10 @@ dev = [
     "tox",
 ]
 
+[project.urls]
+"Homepage" = "https://github.com/tud-cor-sr/jax-spcs-kinematics"
+"Bug Tracker" = "https://github.com/tud-cor-sr/jax-spcs-kinematics/issues"
+
 [tool.setuptools.packages.find]
 # include = ["spcs_kinematics"]
 # exclude = ["logs"]
