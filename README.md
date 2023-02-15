@@ -111,7 +111,7 @@ q = \begin{pmatrix}
     \kappa_z & \sigma_z & 
     \kappa_{x,1} & \kappa_{y,1} & \sigma_{y,1} & \sigma_{y,1}
     \kappa_{x,2} & \kappa_{y,2} & \sigma_{y,2} & \sigma_{y,2}
-\end{pmatrix}^^mathrm{T} \in \mathbb{R}^{11}
+\end{pmatrix}^mathrm{T} \in \mathbb{R}^{11}
 ```
 
 or expressed in words the twist angle $\phi_0$ followed by the constant twist and axial strains $\kappa_z$ and $\sigma_z$.
