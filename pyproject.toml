@@ -59,8 +59,8 @@ dev = [
 "Bug Tracker" = "https://github.com/tud-cor-sr/jax-spcs-kinematics/issues"
 
 [tool.setuptools.packages.find]
-# include = ["spcs_kinematics"]
-# exclude = ["logs"]
+include = ["spcs_kinematics"]
+exclude = []
 
 [tool.black]
 # https://github.com/psf/black
