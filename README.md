@@ -57,6 +57,9 @@ python examples/spcs_example.py
 ## Usage
 
 Below, you can find a minimal example of how to use the SPCS kinematic model.
+
+### Initialization
+
 We start with the initialization of the model:
 
 ```python
@@ -83,7 +86,7 @@ print(kinematics.strain_basis_pcs)
 
 which should result in:
 
-\begin{equation}\small
+```math
 \begin{split}
     B_\mathrm{CS} = \begin{bmatrix}
         0 & 0 & 1 & 0 & 0 & 0\\
@@ -96,9 +99,50 @@ which should result in:
         0 & 0 & 0 & 0 & 1 & 0\\
     \end{bmatrix}^\mathrm{T} \in \mathbb{R}^{6 \times 4}.
 \end{split}
-\end{equation}
+```
 
-Next, we define a kinematic configuration of the robot. Following our choice of strain selectors, it has the following form:
+### Forward kinematics
+
+The configuration vector is then defined as:
+
+```math
+q = \begin{pmatrix}
+    \phi_0 & 
+    \kappa_z & \sigma_z & 
+    \kappa_{x,1} & \kappa_{y,1} & \sigma_{y,1} & \sigma_{y,1}
+    \kappa_{x,2} & \kappa_{y,2} & \sigma_{y,2} & \sigma_{y,2}
+\end{pmatrix}^^mathrm{T} \in \mathbb{R}^{11}
+```
+
+or expressed in words the twist angle $\phi_0$ followed by the constant twist and axial strains $\kappa_z$ and $\sigma_z$.
+The bending and shear strains are then defined for each segment, 
+i.e. $\kappa_{x,1}$, $\kappa_{y,1}$, $\sigma_{y,1}$, $\sigma_{y,1}$ for the first segment and $\kappa_{x,2}$, $\kappa_{y,2}$, $\sigma_{y,2}$, $\sigma_{y,2}$ for the second segment.
+
+Next, we define an example configuration vector and evaluate the forward kinematics at the points 0.5m and 1.0m 
+along the centerline of the rod:
+
+```python
+# configuration vector
+# corresponds to a rod with a twist angle of 20 degrees at the base, a constant twist strain of 20 deg,
+# axial strain of 0.1, bending around x-axis of 90 degrees for the first segment and 90 degrees around the y-axis for the 
+# second segment. All other strains are zero.
+q = jnp.array([
+    20 / 180 * jnp.pi,  # phi_0 
+    jnp.pi, 0.1,  # kappa_z, sigma_z
+    90 / 180 * jnp.pi & 0 & 0 & 0 &  # kappa_x_1, kappa_y_1, sigma_x_1, sigma_y_1
+    0 & 90 / 180 * jnp.pi & 0 & 0  # kappa_x_2, kappa_y_2, sigma_x_2, sigma_y_2
+])
+
+# points
+s = jnp.array([0.5, 1.0])
+
+# evaluate forward kinematics
+# will return the SE(3) transformation matrix for each point along the centerline of the rod
+# T will have shape (4, 4, 2)
+T = kinematics.forward_kinematics(s, q)
+```
+
+### Inverse kinematics
 
 
 ## References
