@@ -1,4 +1,4 @@
-# Selective Piecewise Constant Strain (SPCS) Kinematics
+# Selective Piecewise Constant Strain Kinematics
 
 This repository provides a JAX implementation of the Selective Piecewise Constant Strain (SPCS) kinematics for continuum 
 soft robots. SPCS combines Constant Strain (CS) and Piecewise Constant Strain (PCS) [[1]](#1) kinematics to allow for some strains
@@ -14,6 +14,16 @@ We provide an efficient implementation in JAX for evaluating the 3D forward kine
 centerline of the robot.
 We make use of the JAX autograd capabilities to implement a differential inverse kinematics algorithm that can be
 for example used for shape sensing purposes.
+
+[//]: # (<p float="left">)
+
+[//]: # (  <img src="assets/rendering_of_inverse_kinematics_lemniscate_v4_2s.png" width="100" />)
+
+[//]: # (  <img src="assets/rendering_of_inverse_kinematics_twisting_v4_20s.png" width="100" /> )
+
+[//]: # (</p>)
+
+![alt-text-1](assets/rendering_of_inverse_kinematics_lemniscate_v4_2s.png "title-1") ![alt-text-2](assets/rendering_of_inverse_kinematics_twisting_v4_20s.png "title-2")
 
 ## Citation
 This kinematic model is part of the publication **Modelling Handed Shearing Auxetics:
@@ -72,7 +82,8 @@ kinematics = SelectivePiecewiseConstantStrain(
     l0=jnp.array([0.5, 0.5]),
     # model twist and elongation to be constant across entire rod
     strain_selector_cs=jnp.array([False, False, True, False, False, True]),
-    # model the bending and shear strains to be constant across each segment (i.e. piecewise constant)
+    # model the bending and shear strains to be constant across each segment 
+    # (i.e. piecewise constant)
     strain_selector_pcs=jnp.array([True, True, False, True, True, False])
 )
 ```
@@ -111,7 +122,7 @@ q = \begin{pmatrix}
     \kappa_z & \sigma_z & 
     \kappa_{x,1} & \kappa_{y,1} & \sigma_{y,1} & \sigma_{y,1}
     \kappa_{x,2} & \kappa_{y,2} & \sigma_{y,2} & \sigma_{y,2}
-\end{pmatrix}^mathrm{T} \in \mathbb{R}^{11}
+\end{pmatrix}^\mathrm{T} \in \mathbb{R}^{11}
 ```
 
 or expressed in words the twist angle $\phi_0$ followed by the constant twist and axial strains $\kappa_z$ and $\sigma_z$.
@@ -123,9 +134,11 @@ along the centerline of the rod:
 
 ```python
 # configuration vector
-# corresponds to a rod with a twist angle of 20 degrees at the base, a constant twist strain of 20 deg,
-# axial strain of 0.1, bending around x-axis of 90 degrees for the first segment and 90 degrees around the y-axis for the 
-# second segment. All other strains are zero.
+# corresponds to a rod with a twist angle of 20 degrees at the base, 
+# a constant twist strain of 20 deg, axial strain of 0.1, 
+# bending around x-axis of 90 degrees for the first segment 
+# and 90 degrees around the y-axis for the second segment. 
+# All other strains are zero.
 q = jnp.array([
     20 / 180 * jnp.pi,  # phi_0 
     jnp.pi, 0.1,  # kappa_z, sigma_z
@@ -133,7 +146,7 @@ q = jnp.array([
     0 & 90 / 180 * jnp.pi & 0 & 0  # kappa_x_2, kappa_y_2, sigma_x_2, sigma_y_2
 ])
 
-# points
+# point coordinates
 s = jnp.array([0.5, 1.0])
 
 # evaluate forward kinematics
@@ -144,6 +157,35 @@ T = kinematics.forward_kinematics(s, q)
 
 ### Inverse kinematics
 
+With the same object of the kinematics class, we can also run a differential inverse kinematics optimization to find the 
+configuration vector that corresponds to a given SE(3) transformation matrix:
+
+```python
+# initial guess for the configuration vector
+q_init = jnp.zeros_like(q)
+
+# step size / learning rate for the gradient descent
+GAMMA = 2e-1 * jnp.ones(q.shape)
+
+q_hat, e_chi, q_its, e_chi_its = kinematics.inverse_kinematics(
+    T,  # target transformation matrices
+    s,  # point coordinates
+    num_iterations=1000,  # number of iterations
+    state_init=q_init,  # initial guess for the configuration vector
+    translational_error_weight=1e0,  # weight for the translational error
+    rotational_error_weight=1e0,  # weight for the rotational error
+    gamma=GAMMA,  # step size / learning rate for the gradient descent
+)
+```
+
+## See also
+
+You might also be interested in the following repositories:
+
+ - You can find code and datasets used for the verification of the SPCS model for HSA robots in the 
+[`hsa-kinematic-model`](https://github.com/tud-cor-sr/hsa-kinematic-model) repository.
+ - The [`HSA-PyElastica`](https://github.com/tud-cor-sr/HSA-PyElastica) repository contains a plugin for PyElastica
+for the simulation of HSA robots.
 
 ## References
 <a id="1">[1]</a> Renda, Federico, et al. "Discrete cosserat approach for multisection soft manipulator dynamics." 
