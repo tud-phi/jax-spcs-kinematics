@@ -15,15 +15,7 @@ centerline of the robot.
 We make use of the JAX autograd capabilities to implement a differential inverse kinematics algorithm that can be
 for example used for shape sensing purposes.
 
-[//]: # (<p float="left">)
-
-[//]: # (  <img src="assets/rendering_of_inverse_kinematics_lemniscate_v4_2s.png" width="100" />)
-
-[//]: # (  <img src="assets/rendering_of_inverse_kinematics_twisting_v4_20s.png" width="100" /> )
-
-[//]: # (</p>)
-
-![alt-text-1](assets/rendering_of_inverse_kinematics_lemniscate_v4_2s.png "title-1") ![alt-text-2](assets/rendering_of_inverse_kinematics_twisting_v4_20s.png "title-2")
+![SPCS kinematics applied to HSAs](assets/spcs_applied_to_hsa.png)
 
 ## Citation
 This kinematic model is part of the publication **Modelling Handed Shearing Auxetics:
