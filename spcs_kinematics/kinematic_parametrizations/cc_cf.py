@@ -14,7 +14,9 @@ class ConstantCurvatureClosedForm(BaseKinematicParametrization):
         self.d = d
         self.configuration = jnp.zeros((3,))
 
-    def forward_kinematics(self, points: jnp.array, configuration: jnp.array = None) -> jnp.array:
+    def forward_kinematics(
+        self, points: jnp.array, configuration: jnp.array = None
+    ) -> jnp.array:
         """
         Computes the forward kinematics for the given points and configuration
         Args:
@@ -30,7 +32,9 @@ class ConstantCurvatureClosedForm(BaseKinematicParametrization):
         configuration_ss = jnp.repeat(
             jnp.expand_dims(configuration, axis=1), repeats=points.shape[0], axis=1
         )
-        return compute_cc_forward_kinematics(configuration_ss, points, self.L0, self.d, self.eps)
+        return compute_cc_forward_kinematics(
+            configuration_ss, points, self.L0, self.d, self.eps
+        )
 
     def inverse_kinematics(
         self,
@@ -82,16 +86,16 @@ def compute_cc_forward_kinematics(
 
     R1 = jnp.stack(
         [
-            1 + q[0] ** 2 / Delta_norm ** 2 * (q_cos - 1),
-            q[0] * q[1] / Delta_norm ** 2 * (q_cos - 1),
+            1 + q[0] ** 2 / Delta_norm**2 * (q_cos - 1),
+            q[0] * q[1] / Delta_norm**2 * (q_cos - 1),
             q[0] / Delta_norm * q_sin,
         ],
         axis=0,
     )
     R2 = jnp.stack(
         [
-            q[0] * q[1] / Delta_norm ** 2 * (q_cos - 1),
-            1 + q[1] ** 2 / Delta_norm ** 2 * (q_cos - 1),
+            q[0] * q[1] / Delta_norm**2 * (q_cos - 1),
+            1 + q[1] ** 2 / Delta_norm**2 * (q_cos - 1),
             q[1] / Delta_norm * q_sin,
         ],
         axis=0,
@@ -101,7 +105,7 @@ def compute_cc_forward_kinematics(
     )
     R = jnp.stack([R1, R2, R3], axis=0)
 
-    t = (d * (s + q[2]) / (Delta_norm ** 2)) * jnp.stack(
+    t = (d * (s + q[2]) / (Delta_norm**2)) * jnp.stack(
         [q[0] * (1 - q_cos), q[1] * (1 - q_cos), Delta_norm * q_sin], axis=0
     )
 
@@ -133,7 +137,7 @@ def compute_cc_inverse_kinematics(
     t = T[:3, 3, :]
 
     # address numerical issues of the rotation matrix |R[2, 2]| >= 1
-    R = R.at[2, 2].set(R[2, 2] - jnp.sign(R[2, 2]) * 10 ** 2 * eps)
+    R = R.at[2, 2].set(R[2, 2] - jnp.sign(R[2, 2]) * 10**2 * eps)
 
     # extension of the rod [m]
     delta_L = t[2] * (jnp.arccos(R[2, 2]) / jnp.sin(jnp.arccos(R[2, 2]))) - s

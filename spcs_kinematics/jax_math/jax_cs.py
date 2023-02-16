@@ -56,9 +56,9 @@ def constant_strain_expmap(s: jnp.ndarray, xi: jnp.ndarray, eps: float) -> jnp.n
     g = (
         jnp.identity(4)
         + s * xi_hat
-        + ((1 - jnp.cos(s * theta)) / (theta ** 2 + eps))
+        + ((1 - jnp.cos(s * theta)) / (theta**2 + eps))
         * jnp.linalg.matrix_power(xi_hat, 2)
-        + ((s * theta - jnp.sin(s * theta)) / (theta ** 3 + eps))
+        + ((s * theta - jnp.sin(s * theta)) / (theta**3 + eps))
         * jnp.linalg.matrix_power(xi_hat, 3)
     )
 
@@ -87,22 +87,22 @@ def constant_strain_tangential_expmap(
         jnp.identity(6)
         + (
             (4 - 4 * jnp.cos(s * theta) - s * theta * jnp.sin(s * theta))
-            / (2 * theta ** 2 + eps)
+            / (2 * theta**2 + eps)
         )
         * ad_xi
         + (
             (4 * s * theta - 5 * jnp.sin(s * theta) + s * theta * jnp.cos(s * theta))
-            / (2 * theta ** 3 + eps)
+            / (2 * theta**3 + eps)
         )
         * jnp.linalg.matrix_power(ad_xi, 2)
         + (
             (2 - 2 * jnp.cos(s * theta) - s * theta * jnp.sin(s * theta))
-            / (2 * theta ** 4 + eps)
+            / (2 * theta**4 + eps)
         )
         * jnp.linalg.matrix_power(ad_xi, 3)
         + (
             (2 * s * theta - 3 * jnp.sin(s * theta) + s * theta * jnp.cos(s * theta))
-            / (2 * theta ** 5 + eps)
+            / (2 * theta**5 + eps)
         )
         * jnp.linalg.matrix_power(ad_xi, 4)
     )

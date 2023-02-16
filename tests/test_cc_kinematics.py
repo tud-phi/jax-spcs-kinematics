@@ -45,5 +45,5 @@ def test_cc_inverse_kinematics():
 
     # check the correctness of delta_L
     assert_allclose(
-        configuration[2], jnp.array([0.5, 0.5, 0.5, 0.5]), atol=10 ** 2 * kinematics.eps
+        configuration[2], jnp.array([0.5, 0.5, 0.5, 0.5]), atol=10**2 * kinematics.eps
     )

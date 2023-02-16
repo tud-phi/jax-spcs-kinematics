@@ -36,7 +36,7 @@ def spcs_forward_kinematics(
     k += 1
 
     # xi_cs: constant strain for entire rod: (6, )
-    q_cs = q[k:k+B_xi_cs.shape[1]]
+    q_cs = q[k : k + B_xi_cs.shape[1]]
     xi_cs = configuration_to_constant_strain(B_xi_cs, xi0[0], q_cs)
     k += B_xi_cs.shape[1]
 
@@ -50,7 +50,6 @@ def spcs_forward_kinematics(
 
     # add xi_cs to each segment in xi_pcs
     xi = xi_pcs + xi_cs
-
 
     # compute transformation matrices based on phi0 and dphi_ds
     T_phi0 = jnp.array(
@@ -130,7 +129,9 @@ def spcs_autodiff_analytical_quat_jacobian(
     # make sure that the Jacobian does not become singular
     q = q + jnp.sign(q + eps) * 1e3 * eps
 
-    chi_fun = lambda _q: spcs_forward_kinematics_quat_SE3(B_xi_cs, B_xi_pcs, xi0, s, l0, _q, 1e3 * eps)
+    chi_fun = lambda _q: spcs_forward_kinematics_quat_SE3(
+        B_xi_cs, B_xi_pcs, xi0, s, l0, _q, 1e3 * eps
+    )
 
     J = jacfwd(chi_fun)(q)
 

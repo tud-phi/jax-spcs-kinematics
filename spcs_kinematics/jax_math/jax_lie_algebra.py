@@ -82,17 +82,14 @@ def se3_to_screw_SE3(T: jnp.array, eps: float):
     # rotation angle theta while making sure that the input into arccos is in [-1, 1]
     theta = jnp.arccos((jnp.trace(R) - 1) / 2 - jnp.sign(jnp.trace(R)) * eps)
     # rotation axis n
-    n = (
-        jnp.stack(
-            [
-                R[2, 1] - R[1, 2],
-                R[0, 2] - R[2, 0],
-                R[1, 0] - R[0, 1],
-            ],
-            axis=0,
-        )
-        / (2 * jnp.sin(theta) + eps)
-    )
+    n = jnp.stack(
+        [
+            R[2, 1] - R[1, 2],
+            R[0, 2] - R[2, 0],
+            R[1, 0] - R[0, 1],
+        ],
+        axis=0,
+    ) / (2 * jnp.sin(theta) + eps)
     # rotation vector
     rot_vec = theta * n
 
@@ -189,17 +186,17 @@ def strain_inv_Adjoint(s: jnp.ndarray, xi: jnp.ndarray, eps: float) -> jnp.ndarr
         * ad_xi
         + (
             (4 - 4 * jnp.cos(s * theta) - s * theta * jnp.sin(s * theta))
-            / (2 * theta ** 2 + eps)
+            / (2 * theta**2 + eps)
         )
         * jnp.linalg.matrix_power(ad_xi, 2)
         + (
             (jnp.sin(s * theta) - s * theta * jnp.cos(s * theta))
-            / (2 * theta ** 3 + eps)
+            / (2 * theta**3 + eps)
         )
         * jnp.linalg.matrix_power(ad_xi, 3)
         + (
             (2 - 2 * jnp.cos(s * theta) - s * theta * jnp.sin(s * theta))
-            / (2 * theta ** 4 + eps)
+            / (2 * theta**4 + eps)
         )
         * jnp.linalg.matrix_power(ad_xi, 4)
     )

@@ -4,7 +4,9 @@ import jax.numpy as jnp
 
 
 @jit
-def backbone_radial_transformation(T_s: jnp.ndarray, r: jnp.ndarray, phi: jnp.ndarray) -> jnp.array:
+def backbone_radial_transformation(
+    T_s: jnp.ndarray, r: jnp.ndarray, phi: jnp.ndarray
+) -> jnp.array:
     """
     Computes the transformation of a backbone curve with radial strain
     :param T_s: transformation matrix from the inertial / base frame to a frame s along the backbone of the rod.
@@ -14,26 +16,30 @@ def backbone_radial_transformation(T_s: jnp.ndarray, r: jnp.ndarray, phi: jnp.nd
     :return T_r: transformation matrix from the inertial / base frame to a frame at a radial distance of the rod
         np.ndarray of shape (4, 4)
     """
-    T_r = T_s @ jnp.array([
-        [jnp.cos(phi), -jnp.sin(phi), 0, r * jnp.cos(phi)],
-        [jnp.sin(phi), jnp.cos(phi), 0, r * jnp.sin(phi)],
-        [0, 0, 1, 0],
-        [0, 0, 0, 1],
-    ])
+    T_r = T_s @ jnp.array(
+        [
+            [jnp.cos(phi), -jnp.sin(phi), 0, r * jnp.cos(phi)],
+            [jnp.sin(phi), jnp.cos(phi), 0, r * jnp.sin(phi)],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1],
+        ]
+    )
 
     return T_r
 
 
-vbackbone_radial_transformation = vmap(backbone_radial_transformation, in_axes=(None, 0, 0), out_axes=-1)
+vbackbone_radial_transformation = vmap(
+    backbone_radial_transformation, in_axes=(None, 0, 0), out_axes=-1
+)
 
 
 @partial(jit, static_argnames=("r_resolution", "phi_resolution"))
 def generate_infinitesimal_cylindrical_mesh_points(
-        T_s: jnp.ndarray,
-        outside_radius: jnp.ndarray,
-        inside_radius: jnp.ndarray,
-        r_resolution: int = 10,
-        phi_resolution: int = 32,
+    T_s: jnp.ndarray,
+    outside_radius: jnp.ndarray,
+    inside_radius: jnp.ndarray,
+    r_resolution: int = 10,
+    phi_resolution: int = 32,
 ):
     """
     Generates a mesh of points on a cylinder with a radius of 1.

@@ -35,7 +35,10 @@ class SelectivePiecewiseConstantStrain(NumericKinematics):
         # make sure inputs are correct
         assert strain_selector_cs.shape == (6,) and strain_selector_cs.dtype == bool
         assert strain_selector_pcs.shape == (6,) and strain_selector_pcs.dtype == bool
-        self.strain_selector_cs, self.strain_selector_pcs = strain_selector_cs, strain_selector_pcs
+        self.strain_selector_cs, self.strain_selector_pcs = (
+            strain_selector_cs,
+            strain_selector_pcs,
+        )
         self.strain_basis_cs = jmath.compute_strain_basis(strain_selector_cs)
         self.strain_basis_pcs = jmath.compute_strain_basis(strain_selector_pcs)
 
@@ -48,9 +51,13 @@ class SelectivePiecewiseConstantStrain(NumericKinematics):
         self.rest_strain = rest_strain
 
         # size of configuration vector
-        self.configuration = jnp.zeros((
-            1 + self.strain_basis_cs.shape[1] + num_segments * self.strain_basis_pcs.shape[1],
-        ))
+        self.configuration = jnp.zeros(
+            (
+                1
+                + self.strain_basis_cs.shape[1]
+                + num_segments * self.strain_basis_pcs.shape[1],
+            )
+        )
 
         spcs_forward_kinematics_vmapped = jax.jit(
             jax.vmap(
@@ -60,7 +67,13 @@ class SelectivePiecewiseConstantStrain(NumericKinematics):
             )
         )
         self.transformation_fun = lambda _s, _q: spcs_forward_kinematics_vmapped(
-            self.strain_basis_cs, self.strain_basis_pcs, self.rest_strain, _s, l0, _q, self.eps
+            self.strain_basis_cs,
+            self.strain_basis_pcs,
+            self.rest_strain,
+            _s,
+            l0,
+            _q,
+            self.eps,
         )
         spcs_forward_kinematics_quat_SE3_vmapped = jax.jit(
             jax.vmap(
@@ -70,7 +83,13 @@ class SelectivePiecewiseConstantStrain(NumericKinematics):
             )
         )
         self.pose_fun = lambda _s, _q: spcs_forward_kinematics_quat_SE3_vmapped(
-            self.strain_basis_cs, self.strain_basis_pcs, self.rest_strain, _s, l0, _q, self.eps
+            self.strain_basis_cs,
+            self.strain_basis_pcs,
+            self.rest_strain,
+            _s,
+            l0,
+            _q,
+            self.eps,
         )
 
         spcs_autodiff_analytical_quat_jacobian_vmapped = jax.jit(
@@ -82,6 +101,12 @@ class SelectivePiecewiseConstantStrain(NumericKinematics):
         )
         self.analytical_jacobian_fun = (
             lambda _s, _q: spcs_autodiff_analytical_quat_jacobian_vmapped(
-                self.strain_basis_cs, self.strain_basis_pcs, self.rest_strain, _s, l0, _q, self.eps
+                self.strain_basis_cs,
+                self.strain_basis_pcs,
+                self.rest_strain,
+                _s,
+                l0,
+                _q,
+                self.eps,
             )
         )

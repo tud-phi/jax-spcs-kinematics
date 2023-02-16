@@ -31,6 +31,7 @@ class NumericKinematics(BaseKinematicParametrization):
             N is the number of points, n_q is the number of configuration variables (i.e. the configuration of the system)
             J[:, :, i] is the Jacobian of the ith point in the form of a matrix of shape (7, n_q)
     """
+
     configuration: jnp.array = None
     transformation_fun: Callable = None
     pose_fun: Callable = None

@@ -20,18 +20,26 @@ if __name__ == "__main__":
         # model twist and elongation to be constant across entire rod
         strain_selector_cs=jnp.array([False, False, True, False, False, True]),
         # model the bending and shear strains to be constant across each segment (i.e. piecewise constant)
-        strain_selector_pcs=jnp.array([True, True, False, True, True, False])
+        strain_selector_pcs=jnp.array([True, True, False, True, True, False]),
     )
 
     # max value of point coordinate s
     s_max = jnp.sum(kinematics.l0)
 
-    q = jnp.zeros(kinematics.configuration.shape)  # initialize configuration vector to zero
+    q = jnp.zeros(
+        kinematics.configuration.shape
+    )  # initialize configuration vector to zero
     q = q.at[0].set(20 / 180 * jnp.pi)  # set the twist angle at the base to 20 degrees
     q = q.at[1].set(jnp.pi)  # set the twist strain constant along the rod to pi rad / m
-    q = q.at[2].set(0.1)  # set the elongation strain constant along the rod to 0.1 m / m
-    q = q.at[3].set(90 / 180 * jnp.pi)  # set the x-bending strain constant along the 1st segment
-    q = q.at[-3].set(90 / 180 * jnp.pi)  # set the y-bending strain constant along the 2nd segment
+    q = q.at[2].set(
+        0.1
+    )  # set the elongation strain constant along the rod to 0.1 m / m
+    q = q.at[3].set(
+        90 / 180 * jnp.pi
+    )  # set the x-bending strain constant along the 1st segment
+    q = q.at[-3].set(
+        90 / 180 * jnp.pi
+    )  # set the y-bending strain constant along the 2nd segment
 
     points = jnp.linspace(start=0.0, stop=s_max, num=9)
 

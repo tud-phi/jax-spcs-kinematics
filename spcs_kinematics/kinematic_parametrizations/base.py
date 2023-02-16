@@ -10,6 +10,7 @@ class BaseKinematicParametrization(ABC):
         configuration: configuration vector of the kinematic parametrization of shape (n_q, )
         eps: small number to avoid division by zero
     """
+
     configuration: jnp.array
     eps = 1.19209e-07
 
