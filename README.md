@@ -112,7 +112,7 @@ The configuration vector is then defined as:
 q = \begin{pmatrix}
     \phi_0 & 
     \kappa_z & \sigma_z & 
-    \kappa_{x,1} & \kappa_{y,1} & \sigma_{y,1} & \sigma_{y,1}
+    \kappa_{x,1} & \kappa_{y,1} & \sigma_{y,1} & \sigma_{y,1} &
     \kappa_{x,2} & \kappa_{y,2} & \sigma_{y,2} & \sigma_{y,2}
 \end{pmatrix}^\mathrm{T} \in \mathbb{R}^{11}
 ```

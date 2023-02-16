@@ -41,13 +41,14 @@ class SelectivePiecewiseConstantStrain(NumericKinematics):
 
         if rest_strain is None:
             rest_strain = jnp.zeros((num_segments + 1, 6))
+            # by default, set the axial rest strain across the rod to 1.0
             rest_strain = rest_strain.at[0, -1].set(1.0)
         else:
             assert rest_strain.shape == (num_segments + 1, 6)
         self.rest_strain = rest_strain
 
         # size of configuration vector
-        self.state = jnp.zeros((
+        self.configuration = jnp.zeros((
             1 + self.strain_basis_cs.shape[1] + num_segments * self.strain_basis_pcs.shape[1],
         ))
 

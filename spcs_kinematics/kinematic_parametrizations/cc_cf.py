@@ -9,26 +9,46 @@ class ConstantCurvatureClosedForm(BaseKinematicParametrization):
     def __init__(self, L0: float, d: float = 1.0):
         super().__init__()
 
-        # state: [Delta_x, Delta_y, delta_L]
+        # configuration: [Delta_x, Delta_y, delta_L]
         self.L0 = L0
         self.d = d
-        self.state = jnp.zeros((3,))
+        self.configuration = jnp.zeros((3,))
 
-    def forward_kinematics(self, points: jnp.array) -> jnp.array:
-        states = jnp.repeat(
-            jnp.expand_dims(self.state, axis=1), repeats=points.shape[0], axis=1
+    def forward_kinematics(self, points: jnp.array, configuration: jnp.array = None) -> jnp.array:
+        """
+        Computes the forward kinematics for the given points and configuration
+        Args:
+            points: array of points s with shape (N, )
+                points are specified along the backbone in interval [0, L0]
+                where L0 is the unelongated length of the rod
+            configuration: array of shape (3, ) with the CC configuration as [Delta_x, Delta_y, delta_L]
+        Returns:
+            T: transformation matrix T from the base to each point s as (4, 4, N)
+        """
+        if configuration is None:
+            configuration = self.configuration
+        configuration_ss = jnp.repeat(
+            jnp.expand_dims(configuration, axis=1), repeats=points.shape[0], axis=1
         )
-        return compute_cc_forward_kinematics(states, points, self.L0, self.d, self.eps)
+        return compute_cc_forward_kinematics(configuration_ss, points, self.L0, self.d, self.eps)
 
     def inverse_kinematics(
         self,
         transformations: jnp.array,
         points: jnp.array,
     ) -> jnp.array:
-        self.state = compute_cc_inverse_kinematics(
+        """
+        Computes the inverse kinematics for the given points and transformation matrices
+        Args:
+            transformations: array of transformation matrices T from the base to each point s as (4, 4, N)
+            points: array of points s with shape (N, )
+        Returns:
+            configuration: array of shape (3, ) with the CC configuration as [Delta_x, Delta_y, delta_L]
+        """
+        self.configuration = compute_cc_inverse_kinematics(
             transformations, points, self.L0, self.d, self.eps
         )
-        return self.state
+        return self.configuration
 
     def compute_residual(self) -> jnp.array:
         pass
@@ -40,7 +60,7 @@ def compute_cc_forward_kinematics(
 ) -> jnp.array:
     """
     Used to derive the transformation matrices for each point s along the backbone.
-    :param q: state vector of dimension (3, n)
+    :param q: configuration vector of dimension (3, n)
     :param s: vector with points s along the backbone in interval [0, L0] and dimension (n,)
     :param L0: unelongated length of the rod
     :param d: radius of the rod
@@ -99,7 +119,7 @@ def compute_cc_inverse_kinematics(
     T: jnp.array, s: jnp.array, L0: float, d: float, eps: float
 ) -> jnp.array:
     """
-    Used to derive the state vector from the transformation matrices for a set of points along the backbone.
+    Used to derive the configuration vector from the transformation matrices for a set of points along the backbone.
     :param T: transformation matrix from the base of the segment for each point s as (4, 4, n)
     :param s: vector with points s along the backbone in interval [0, L0] and dimension (n,)
     :param L0: unelongated length of the rod
@@ -123,7 +143,7 @@ def compute_cc_inverse_kinematics(
     Delta_x = t[0] * delta_c
     Delta_y = t[1] * delta_c
 
-    # state of each point (not scaled yet to the full rod)
+    # configuration of each point (not scaled yet to the full rod)
     q = jnp.stack([Delta_x, Delta_y, delta_L], axis=0)
 
     # scale q to the full rod length

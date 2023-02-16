@@ -6,29 +6,69 @@ from typing import Callable, Tuple
 import warnings
 
 
-from .base_kinematic_parametrization import BaseKinematicParametrization
+from .base import BaseKinematicParametrization
 import spcs_kinematics.jax_math as jmath
 
 
 class NumericKinematics(BaseKinematicParametrization):
-    state: jnp.array = None
+    """
+    Base class for kinematic parametrizations that are based on numerical evaluation of the forward kinematics.
+    Parameters:
+        configuration: array of shape (n_q, ) with kinematic configuration (i.e. the configuration of the system)
+        transformation_fun: function that computes the SE(3) transformation of a set of points given a configuration
+            Needs to have the signature transformation_fun(s, q) -> T
+            where s is an array of shape (N, ), q is an array of shape (n_q, ), and T is an array of shape (4, 4, N)
+            N is the number of points, n_q is the number of configuration variables
+        pose_fun: function that computes the pose of a set of points given a configuration
+            Needs to have the signature pose_fun(s, q) -> chi
+            where s is an array of shape (N, ), q is an array of shape (n_q, ), and chi is an array of shape (7, N)
+            N is the number of points, n_q is the number of configuration variables (i.e. the configuration of the system)
+            chi[:, i] is the pose of the ith point in the form of a vector of shape (7, ) with the first three entries
+            being the translation and the last three entries being the rotation in quaternion form
+        analytical_jacobian_fun: function that computes the analytical Jacobian of the pose chi w.r.t. the configuration q
+            Needs to have the signature analytical_jacobian_fun(s, q) -> J
+            where s is an array of shape (N, ), q is an array of shape (n_q, ), and J is an array of shape (7, n_q, N)
+            N is the number of points, n_q is the number of configuration variables (i.e. the configuration of the system)
+            J[:, :, i] is the Jacobian of the ith point in the form of a matrix of shape (7, n_q)
+    """
+    configuration: jnp.array = None
     transformation_fun: Callable = None
     pose_fun: Callable = None
     analytical_jacobian_fun: Callable = None
 
     def forward_kinematics(
-        self, points: jnp.array, state: jnp.array = None
+        self, points: jnp.array, configuration: jnp.array = None
     ) -> jnp.array:
-        if state is None:
-            state = self.state
-        return self.transformation_fun(points, state)
+        """
+        Computes the forward kinematics for the given points and configuration
+        Args:
+            points: array of points s with shape (N, )
+                points are specified along the backbone in interval [0, L0]
+                where L0 is the unelongated length of the rod
+            configuration: array of shape (n_q, ) with kinematic configuration (i.e. the configuration of the system)
+        Returns:
+            T: transformation matrix T from the base to each point s as (4, 4, N)
+        """
+        if configuration is None:
+            configuration = self.configuration
+        return self.transformation_fun(points, configuration)
 
     def analytical_jacobian(
-        self, points: jnp.array, state: jnp.array = None
+        self, points: jnp.array, configuration: jnp.array = None
     ) -> jnp.array:
-        if state is None:
-            state = self.state
-        return self.analytical_jacobian_fun(points, state)
+        """
+        Computes the analytical Jacobian of the pose chi w.r.t. the configuration q
+        Args:
+            points: array of points s with shape (N, )
+                points are specified along the backbone in interval [0, L0]
+                where L0 is the unelongated length of the rod
+            configuration: array of shape (n_q, ) with kinematic configuration (i.e. the configuration of the system)
+        Returns:
+            J: Jacobian of the pose chi w.r.t. the configuration q of shape (7, n_q, N)
+        """
+        if configuration is None:
+            configuration = self.configuration
+        return self.analytical_jacobian_fun(points, configuration)
 
     def inverse_kinematics(
         self,
@@ -40,10 +80,29 @@ class NumericKinematics(BaseKinematicParametrization):
         rotational_error_weight: float = 1.0,
         gamma: jnp.ndarray = jnp.array(1e-3),
     ) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray]:
+        """
+        Computes the inverse kinematics for the given points and SE(3) transformations
+        Args:
+            transformations: array of SE(3) transformations T from the base to each point s as (4, 4, N)
+            points: array of points s with shape (N, )
+                points are specified along the backbone in interval [0, L0]
+                where L0 is the unelongated length of the rod
+            state_init: array of shape (n_q, ) with initial kinematic configuration (i.e. the configuration of the system)
+            num_iterations: number of iterations to run the differential inverse kinematics for
+            translational_error_weight: weight for the translational error during the optimization
+            rotational_error_weight: weight for the rotational error during the optimization
+            gamma: step size / learning rate of the gradient descent optimization
+        Returns:
+            q: array of shape (n_q, ) with optimized kinematic configuration (i.e. the configuration of the system)
+            e_chi: array of shape (7, N) with the final pose error
+            q_its: array of shape (num_iterations, n_q) with the kinematic configuration at each iteration
+            e_chi_its: array of shape (num_iterations, 7, N) with the pose error at each iteration
+        """
+
         # set the initial configuration
         q_init = state_init
         if q_init is None:
-            q_init = jnp.zeros_like(self.state)
+            q_init = jnp.zeros_like(self.configuration)
         q = q_init.copy()
 
         # compute goal pose
@@ -79,7 +138,7 @@ class NumericKinematics(BaseKinematicParametrization):
         q_its = jnp.stack(q_its, axis=0)
         e_chi_its = jnp.stack(e_chi_its, axis=0)
 
-        self.state = q
+        self.configuration = q
         return q, e_chi, q_its, e_chi_its
 
 

@@ -29,30 +29,30 @@ class ConstantStrain(NumericKinematics):
         self.rest_strain = rest_strain
 
         # size of configuration vector
-        self.state = jnp.zeros((self.strain_basis.shape[1],))
+        self.configuration = jnp.zeros((self.strain_basis.shape[1],))
 
-        vconstant_strain_forward_kinematics = jax.jit(
+        cs_forward_kinematics_vmapped = jax.jit(
             jax.vmap(
                 jmath.constant_strain_forward_kinematics,
                 in_axes=(None, None, 0, None, None),
                 out_axes=2,
             )
         )
-        self.transformation_fun = lambda _s, _q: vconstant_strain_forward_kinematics(
+        self.transformation_fun = lambda _s, _q: cs_forward_kinematics_vmapped(
             self.strain_basis, self.rest_strain, _s, _q, self.eps
         )
-        vconstant_strain_forward_kinematics_quat_SE3 = jax.jit(
+        cs_forward_kinematics_quat_SE3_vmapped = jax.jit(
             jax.vmap(
                 jmath.constant_strain_forward_kinematics_quat_SE3,
                 in_axes=(None, None, 0, None, None),
                 out_axes=1,
             )
         )
-        self.pose_fun = lambda _s, _q: vconstant_strain_forward_kinematics_quat_SE3(
+        self.pose_fun = lambda _s, _q: cs_forward_kinematics_quat_SE3_vmapped(
             self.strain_basis, self.rest_strain, _s, _q, self.eps
         )
 
-        vconstant_strain_autodiff_analytical_quat_jacobian = jax.jit(
+        cs_autodiff_analytical_quat_jacobian_vmapped = jax.jit(
             jax.vmap(
                 jmath.constant_strain_autodiff_analytical_quat_jacobian,
                 in_axes=(None, None, 0, None, None),
@@ -60,7 +60,7 @@ class ConstantStrain(NumericKinematics):
             )
         )
         self.analytical_jacobian_fun = (
-            lambda _s, _q: vconstant_strain_autodiff_analytical_quat_jacobian(
+            lambda _s, _q: cs_autodiff_analytical_quat_jacobian_vmapped(
                 self.strain_basis, self.rest_strain, _s, _q, self.eps
             )
         )

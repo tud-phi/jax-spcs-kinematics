@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # max value of point coordinate s
     s_max = jnp.sum(kinematics.l0)
 
-    q = jnp.zeros(kinematics.state.shape)  # initialize configuration vector to zero
+    q = jnp.zeros(kinematics.configuration.shape)  # initialize configuration vector to zero
     q = q.at[0].set(20 / 180 * jnp.pi)  # set the twist angle at the base to 20 degrees
     q = q.at[1].set(jnp.pi)  # set the twist strain constant along the rod to pi rad / m
     q = q.at[2].set(0.1)  # set the elongation strain constant along the rod to 0.1 m / m
@@ -36,10 +36,10 @@ if __name__ == "__main__":
     points = jnp.linspace(start=0.0, stop=s_max, num=9)
 
     print("Plotting configuration:\n", q)
-    T = kinematics.forward_kinematics(points, state=q)
+    T = kinematics.forward_kinematics(points, configuration=q)
     plot_rod_shape(T=T)
 
-    # Run inverse kinematics to estimate the state of the rod
+    # Run inverse kinematics to estimate the configuration of the rod
     q_init = jnp.zeros_like(q)  # initial guess for the configuration
     print("Running inverse kinematics...")
     q_hat, e_chi, q_its, e_chi_its = kinematics.inverse_kinematics(
@@ -55,8 +55,8 @@ if __name__ == "__main__":
     e_quat, e_t = jmath.quat_pose_error_to_rmse(e_chi)
     print(f"RMSE errors: e_quat={e_quat}, e_t={e_t}")
 
-    # use estimated state to compute transformation matrices to points
-    T_hat = kinematics.forward_kinematics(points, state=q_hat)
+    # use estimated configuration to compute transformation matrices to points
+    T_hat = kinematics.forward_kinematics(points, configuration=q_hat)
 
     # plot the ground-truth and the estimated rod shape
     plot_points = jnp.linspace(start=0.0, stop=1.0, num=20)
