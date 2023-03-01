@@ -48,6 +48,12 @@ or locally from the source code:
 pip install .
 ```
 
+If you want to run the examples, please install some additional dependencies via:
+
+```bash
+pip install ".[examples]"
+```
+
 ## Getting started
 
 We invite you to run the example script to demonstrate both the forward and inverse kinematics capabilities of the SPCS model:

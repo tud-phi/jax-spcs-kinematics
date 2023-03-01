@@ -2,7 +2,7 @@ from jax import numpy as jnp
 
 from spcs_kinematics.kinematic_parametrizations import SelectivePiecewiseConstantStrain
 import spcs_kinematics.jax_math as jmath
-from spcs_kinematics.visualization import (
+from examples.visualization import (
     plot_rod_shape,
     plot_inverse_kinematics_convergence,
 )
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     q_hat, e_chi, q_its, e_chi_its = kinematics.inverse_kinematics(
         T,
         points,
-        num_iterations=1000,
+        num_iterations=2500,
         state_init=q_init,
         translational_error_weight=1e0,
         rotational_error_weight=1e0,

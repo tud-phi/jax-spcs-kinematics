@@ -11,13 +11,7 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = [
-    "dill",
-    "jax",
-    "matplotlib",
-    "numpy",
-    "progressbar2",
-]
+dependencies = ["jax", "progressbar2"]
 license = {text = "MIT"}
 classifiers = [  # Optional
         # How mature is this project? Common values are
@@ -55,6 +49,10 @@ dev = [
     "pytest-cov",
     "pytest-html",
     "tox",
+]
+examples = [
+    "matplotlib",
+    "numpy",
 ]
 
 [project.urls]
