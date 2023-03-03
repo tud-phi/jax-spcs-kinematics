@@ -105,7 +105,7 @@ which should result in:
         1 & 0 & 0 & 0 & 0 & 0\\
         0 & 1 & 0 & 0 & 0 & 0\\
         0 & 0 & 0 & 1 & 0 & 0\\
-        0 & 0 & 0 & 0 & 1 & 0\\
+        0 & 0 & 0 & 0 & 1 & 0
     \end{bmatrix}^\mathrm{T} \in \mathbb{R}^{6 \times 4}.
 \end{split}
 ```
