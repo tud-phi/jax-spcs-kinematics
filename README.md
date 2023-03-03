@@ -99,7 +99,7 @@ which should result in:
 \begin{split}
     B_\mathrm{CS} = \begin{bmatrix}
         0 & 0 & 1 & 0 & 0 & 0\\
-        0 & 0 & 0 & 0 & 0 & 1\\
+        0 & 0 & 0 & 0 & 0 & 1
     \end{bmatrix}^\mathrm{T} \in \mathbb{R}^{6 \times 2},\\
     B_{\mathrm{PCS},i} = \begin{bmatrix}
         1 & 0 & 0 & 0 & 0 & 0\\
