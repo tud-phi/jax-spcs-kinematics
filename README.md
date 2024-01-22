@@ -181,8 +181,8 @@ q_hat, e_chi, q_its, e_chi_its = kinematics.inverse_kinematics(
 You might also be interested in the following repositories:
 
  - You can find code and datasets used for the verification of the SPCS model for HSA robots in the 
-[`hsa-kinematic-model`](https://github.com/tud-cor-sr/hsa-kinematic-model) repository.
- - The [`HSA-PyElastica`](https://github.com/tud-cor-sr/HSA-PyElastica) repository contains a plugin for PyElastica
+[`hsa-kinematic-model`](https://github.com/tud-phi/hsa-kinematic-model) repository.
+ - The [`HSA-PyElastica`](https://github.com/tud-phi/HSA-PyElastica) repository contains a plugin for PyElastica
 for the simulation of HSA robots.
 
 ## References
